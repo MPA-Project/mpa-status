@@ -4,6 +4,7 @@ module.exports = {
   purge: {
     content: ['./src/**/*.js', './pages/**/*.js', './public/tailwind.css'],
   },
+  mode: 'jit',
   presets: [],
   darkMode: 'class', // or 'media' or 'class'
   theme: {
