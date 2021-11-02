@@ -6,7 +6,7 @@ webpack_config = "node_modules/flareact/webpack"
 compatibility_date = "2021-07-23"
 
 [triggers]
-crons = ["* * * * *"]
+crons = ["*/2 * * * *"]
 
 [site]
 bucket = "out"
@@ -14,6 +14,6 @@ entry-point = "./"
 
 # uncomment and adjust following if you are not using GitHub Actions
 #[env.production]
-#kv-namespaces = [{binding="KV_STATUS_PAGE", id="xxxx", preview_id=""}]
+#kv_namespaces = [{binding="KV_STATUS_PAGE", id="27582eac60b5415eae85e3aba4f719ee", preview_id="27582eac60b5415eae85e3aba4f719ee"}]
 #zone_id="xxx"
 #route="xxx"
