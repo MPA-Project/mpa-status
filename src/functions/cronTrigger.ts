@@ -132,7 +132,9 @@ export async function processCronTrigger(event: any) {
     // make sure checkDay exists in checks in cases when needed
     if (
       (config.settings.collectResponseTimes || !monitorOperational) &&
-      !Object.prototype.hasOwnProperty.call(monitorsState.monitors[monitor.id].checks, checkDay)
+      // !Object.prototype.hasOwnProperty.call(monitorsState.monitors[monitor.id].checks, checkDay)
+      // eslint-disable-next-line no-prototype-builtins
+      monitorsState.monitors[monitor.id].checks.hasOwnProperty(checkDay)
     ) {
       monitorsState.monitors[monitor.id].checks[checkDay] = {
         fails: 0,
@@ -143,7 +145,9 @@ export async function processCronTrigger(event: any) {
     if (config.settings.collectResponseTimes && monitorOperational) {
       // make sure location exists in current checkDay
       if (
-        !Object.prototype.hasOwnProperty.call(monitorsState.monitors[monitor.id].checks[checkDay].res, checkLocation as string)
+        // !Object.prototype.hasOwnProperty.call(monitorsState.monitors[monitor.id].checks[checkDay].res, checkLocation as string)
+        // eslint-disable-next-line no-prototype-builtins
+      monitorsState.monitors[monitor.id].checks[checkDay].res.hasOwnProperty(checkLocation as string)
       ) {
         monitorsState.monitors[monitor.id].checks[checkDay].res[
           checkLocation as string

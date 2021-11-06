@@ -1,6 +1,6 @@
 const path = require('path')
-const { EnvironmentPlugin } = require("webpack")
-const nodeExternals = require('webpack-node-externals')
+// const { EnvironmentPlugin } = require("webpack")
+// const nodeExternals = require('webpack-node-externals')
 
 module.exports = {
   entry: './src/index.ts',
@@ -8,13 +8,17 @@ module.exports = {
     filename: 'worker.js',
     path: path.join(__dirname, 'dist'),
   },
+  target: 'webworker',
   devtool: 'cheap-module-source-map',
   mode: 'development',
   resolve: {
     extensions: ['.ts', '.tsx', '.js'],
   },
-  externalsPresets: { node: true },
-  externals: [nodeExternals()],
+  // externalsPresets: { node: true },
+  // externals: [nodeExternals()],
+  optimization: {
+    minimize: false,
+  },
   module: {
     rules: [
       {
