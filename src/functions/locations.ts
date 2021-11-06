@@ -1,4 +1,4 @@
-export const locations = {
+export const locations: { [key: string]: string } = {
   ADL: 'Adelaide',
   AKL: 'Auckland',
   ALG: 'Algiers',

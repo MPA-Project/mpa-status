@@ -1,5 +1,4 @@
 import config from '../../config.yaml'
-import { useEffect, useState } from 'react'
 
 const kvDataKey = 'monitors_data_v1_1'
 
@@ -9,21 +8,21 @@ export async function getKVMonitors() {
   //return JSON.parse(await KV_STATUS_PAGE.get(kvDataKey, 'text'))
 }
 
-export async function setKVMonitors(data) {
+export async function setKVMonitors(data: any) {
   return setKV(kvDataKey, JSON.stringify(data))
 }
 
-const getOperationalLabel = (operational) => {
+const getOperationalLabel = (operational: any) => {
   return operational
     ? config.settings.monitorLabelOperational
     : config.settings.monitorLabelNotOperational
 }
 
-export async function setKV(key, value, metadata, expirationTtl) {
+export async function setKV(key: string, value: any, metadata = undefined, expirationTtl = undefined) {
   return KV_STATUS_PAGE.put(key, value, { metadata, expirationTtl })
 }
 
-export async function notifySlack(monitor, operational) {
+export async function notifySlack(monitor: any, operational: any) {
   const payload = {
     attachments: [
       {
@@ -63,7 +62,7 @@ export async function notifySlack(monitor, operational) {
   })
 }
 
-export async function notifyTelegram(monitor, operational) {
+export async function notifyTelegram(monitor: any, operational: any) {
   const text = `Monitor *${monitor.name.replace(
     '-',
     '\\-',
@@ -85,10 +84,8 @@ export async function notifyTelegram(monitor, operational) {
 }
 
 // Visualize your payload using https://leovoel.github.io/embed-visualizer/
-export async function notifyDiscord(monitor, operational) {
+export async function notifyDiscord(monitor: any, operational: any) {
   const payload = {
-    username: `${config.settings.title}`,
-    avatar_url: `${config.settings.url}/${config.settings.logo}`,
     embeds: [
       {
         title: `${monitor.name} is ${getOperationalLabel(operational)} ${
@@ -108,37 +105,9 @@ export async function notifyDiscord(monitor, operational) {
   })
 }
 
-export function useKeyPress(targetKey) {
-  const [keyPressed, setKeyPressed] = useState(false)
-
-  function downHandler({ key }) {
-    if (key === targetKey) {
-      setKeyPressed(true)
-    }
-  }
-
-  const upHandler = ({ key }) => {
-    if (key === targetKey) {
-      setKeyPressed(false)
-    }
-  }
-
-  useEffect(() => {
-    window.addEventListener('keydown', downHandler)
-    window.addEventListener('keyup', upHandler)
-
-    return () => {
-      window.removeEventListener('keydown', downHandler)
-      window.removeEventListener('keyup', upHandler)
-    }
-  }, [])
-
-  return keyPressed
-}
-
 export async function getCheckLocation() {
   const res = await fetch('https://cloudflare-dns.com/dns-query', {
     method: 'OPTIONS',
   })
-  return res.headers.get('cf-ray').split('-')[1]
+  return res.headers.get('cf-ray')?.split('-')[1]
 }

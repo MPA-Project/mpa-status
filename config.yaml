@@ -11,6 +11,8 @@ settings:
   dayInHistogramOperational: 'All good'
   dayInHistogramNotOperational: ' incident(s)'
 
+  url: 'https://status.myponyasia.com'
+
 monitors:
   - id: api
     name: API

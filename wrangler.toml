@@ -1,16 +1,19 @@
 name = "status"
 workers_dev = true
+zone_id = ""
 account_id = ""
+route = ""
 type = "webpack"
-webpack_config = "node_modules/flareact/webpack"
-compatibility_date = "2021-07-23"
+compatibility_date = "2021-11-06"
+
+[build]
+command = "yarn install && yarn build"
+
+[build.upload]
+format = "service-worker"
 
 [triggers]
 crons = ["* * * * *"]
-
-[site]
-bucket = "out"
-entry-point = "./"
 
 # uncomment and adjust following if you are not using GitHub Actions
 #[env.production]

@@ -1,57 +1,46 @@
 import { S3 } from 'aws-sdk'
-const yaml = require('yaml-loader')
-const fs = require('fs')
+import config from '../../config.yaml'
 
 import {
   notifySlack,
   notifyTelegram,
   getCheckLocation,
-  getKVMonitors,
-  setKVMonitors,
   notifyDiscord,
 } from './helpers'
-
-export function loadConfig() {
-  const configFile = fs.readFileSync('./config.yaml', 'utf8')
-  const config = yaml(configFile)
-  return JSON.parse(config)
-}
-
-const config = loadConfig()
 
 function getDate() {
   return new Date().toISOString().split('T')[0]
 }
 
-export async function processCronTrigger(event) {
+export async function processCronTrigger(event: any) {
   // Get Worker PoP and save it to monitorsStateMetadata
   const checkLocation = await getCheckLocation()
   const checkDay = getDate()
 
   // Init monitors state
-  let monitorsState = null
+  let monitorsState = undefined
   const s3 = new S3({
-    endpoint: process.env.AWS_S3_ENDPOINT,
-    region: process.env.AWS_S3_REGION,
+    endpoint: AWS_S3_ENDPOINT,
+    region: AWS_S3_REGION,
     credentials: {
-      accessKeyId: process.env.AWS_S3_ACCESS_KEY,
-      secretAccessKey: process.env.AWS_S3_SECRET_KEY
+      accessKeyId: AWS_S3_ACCESS_KEY as string,
+      secretAccessKey: AWS_S3_SECRET_KEY as string
     },
   })
 
-  const s3ParamsDownload = {
-    Key: process.env.STORE_FILENAME,
-    Bucket: process.env.AWS_S3_BUCKET,
+  const s3ParamsDownload: S3.GetObjectRequest = {
+    Key: STORE_FILENAME as string,
+    Bucket: AWS_S3_BUCKET as string,
   };
 
   // Get monitors state from S3
   try {
     const getData = await s3.getObject(s3ParamsDownload).promise()
     if (getData.Body) {
-      const getDataBody = JSON.parse(getData.Body?.toString()) || null
+      const getDataBody = JSON.parse(getData.Body.toString()) || undefined
       monitorsState = getDataBody
     }
-  } catch (error) {
+  } catch (error: any) {
     return new Response(error.message || error.toString(), {
       status: 500,
     })
@@ -149,11 +138,11 @@ export async function processCronTrigger(event) {
       // make sure location exists in current checkDay
       if (
         !monitorsState.monitors[monitor.id].checks[checkDay].res.hasOwnProperty(
-          checkLocation,
+          checkLocation as string,
         )
       ) {
         monitorsState.monitors[monitor.id].checks[checkDay].res[
-          checkLocation
+          checkLocation as string
         ] = {
           n: 0,
           ms: 0,
@@ -163,15 +152,15 @@ export async function processCronTrigger(event) {
 
       // increment number of checks and sum of ms
       const no = ++monitorsState.monitors[monitor.id].checks[checkDay].res[
-        checkLocation
+        checkLocation as string
       ].n
       const ms = (monitorsState.monitors[monitor.id].checks[checkDay].res[
-        checkLocation
+        checkLocation as string
       ].ms += requestTime)
 
       // save new average ms
       monitorsState.monitors[monitor.id].checks[checkDay].res[
-        checkLocation
+        checkLocation as string
       ].a = Math.round(ms / no)
     } else if (!monitorOperational) {
       // Save allOperational to false
@@ -190,15 +179,15 @@ export async function processCronTrigger(event) {
 
   // Save monitorsState to S3 storage
   // await setKVMonitors(monitorsState)
-  const s3ParamsUpload = {
-    Key: process.env.STORE_FILENAME,
-    Bucket: process.env.AWS_S3_BUCKET,
+  const s3ParamsUpload: S3.PutObjectRequest = {
+    Key: STORE_FILENAME as string,
+    Bucket: AWS_S3_BUCKET as string,
     Body: JSON.stringify(monitorsState),
   }
 
   try {
     await s3.upload(s3ParamsUpload).promise()
-  } catch (error) {
+  } catch (error: any) {
     return new Response(error.message || error.toString(), {
       status: 500,
     })
