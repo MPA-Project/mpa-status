@@ -1,4 +1,5 @@
-import config from '../../config.yaml'
+import { loadConfig } from "../cli/gcMonitors";
+import { S3 } from 'aws-sdk'
 
 import {
   notifySlack,
@@ -9,6 +10,8 @@ import {
   notifyDiscord,
 } from './helpers'
 
+const config = loadConfig()
+
 function getDate() {
   return new Date().toISOString().split('T')[0]
 }
@@ -18,8 +21,34 @@ export async function processCronTrigger(event) {
   const checkLocation = await getCheckLocation()
   const checkDay = getDate()
 
-  // Get monitors state from KV
-  let monitorsState = await getKVMonitors()
+  // Init monitors state
+  let monitorsState = null
+  const s3 = new S3({
+    endpoint: process.env.AWS_S3_ENDPOINT,
+    region: process.env.AWS_S3_REGION,
+    credentials: {
+      accessKeyId: process.env.AWS_S3_ACCESS_KEY,
+      secretAccessKey: process.env.AWS_S3_SECRET_KEY
+    },
+  })
+
+  const s3ParamsDownload = {
+    Key: process.env.STORE_FILENAME,
+    Bucket: process.env.AWS_S3_BUCKET,
+  };
+
+  // Get monitors state from S3
+  try {
+    const getData = await s3.getObject(s3ParamsDownload).promise()
+    if (getData.Body) {
+      const getDataBody = JSON.parse(getData.Body?.toString()) || null
+      monitorsState = getDataBody
+    }
+  } catch (error) {
+    return new Response(error.message || error.toString(), {
+      status: 500,
+    })
+  }
 
   // Create empty state objects if not exists in KV storage yet
   if (!monitorsState) {
@@ -46,7 +75,7 @@ export async function processCronTrigger(event) {
       method: monitor.method || 'GET',
       redirect: monitor.followRedirect ? 'follow' : 'manual',
       headers: {
-        'User-Agent': config.settings.user_agent || 'cf-worker-status-page',
+        'User-Agent': config.settings.userAgent || 'cf-worker-status-page',
       },
     }
 
@@ -152,8 +181,21 @@ export async function processCronTrigger(event) {
   monitorsState.lastUpdate.time = Date.now()
   monitorsState.lastUpdate.loc = checkLocation
 
-  // Save monitorsState to KV storage
-  await setKVMonitors(monitorsState)
+  // Save monitorsState to S3 storage
+  // await setKVMonitors(monitorsState)
+  const s3ParamsUpload = {
+    Key: process.env.STORE_FILENAME,
+    Bucket: process.env.AWS_S3_BUCKET,
+    Body: JSON.stringify(monitorsState),
+  }
+
+  try {
+    await s3.upload(s3ParamsUpload).promise()
+  } catch (error) {
+    return new Response(error.message || error.toString(), {
+      status: 500,
+    })
+  }
 
   return new Response('OK')
 }

@@ -1,9 +1,6 @@
 settings:
-  title: 'MPA Status Page'
-  url: 'https://status-page.eidam.dev' # used for Slack messages
-  logo: logo-192x192.png # image in ./public/ folder
-  daysInHistogram: 90 # number of days you want to display in histogram
-  collectResponseTimes: true # collects avg response times from CRON locations
+  daysInHistogram: 90
+  collectResponseTimes: true
 
   allmonitorsOperational: 'All Systems Operational'
   notAllmonitorsOperational: 'Not All Systems Operational'
@@ -16,7 +13,7 @@ settings:
 
 monitors:
   - id: api
-    name: api.myponyasia.com
+    name: API
     description: 'A main API.'
     url: 'https://api.myponyasia.com/api'
     method: GET
@@ -25,7 +22,7 @@ monitors:
     linkable: false
 
   - id: homebase
-    name: myponyasia.com
+    name: Homepage
     description: 'A homepage of MyPonyAsia.'
     url: 'https://myponyasia.com'
     method: GET
@@ -34,7 +31,7 @@ monitors:
     linkable: true
 
   - id: pony
-    name: pony.myponyasia.com
+    name: Pony
     description: 'A pony page of MyPonyAsia.'
     url: 'https://pony.myponyasia.com'
     method: GET
@@ -43,7 +40,7 @@ monitors:
     linkable: true
 
   - id: anime
-    name: anime.myponyasia.com
+    name: Anime
     description: 'A anime page of MyPonyAsia.'
     url: 'https://anime.myponyasia.com'
     method: GET
