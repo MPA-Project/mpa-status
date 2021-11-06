@@ -1,4 +1,6 @@
 import config from '../../config.yaml'
+import { FormData } from 'formdata-node'
+import axios from 'axios'
 
 const kvDataKey = 'monitors_data_v1_1'
 
@@ -55,8 +57,8 @@ export async function notifySlack(monitor: any, operational: any) {
       },
     ],
   }
-  return fetch(SECRET_SLACK_WEBHOOK_URL, {
-    body: JSON.stringify(payload),
+  return axios(SECRET_SLACK_WEBHOOK_URL, {
+    data: JSON.stringify(payload),
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
   })
@@ -72,14 +74,15 @@ export async function notifyTelegram(monitor: any, operational: any) {
   }\` \\- 👀 [Status Page](${config.settings.url})`
 
   const payload = new FormData()
-  payload.append('chat_id', SECRET_TELEGRAM_CHAT_ID)
-  payload.append('parse_mode', 'MarkdownV2')
-  payload.append('text', text)
+  payload.set('chat_id', SECRET_TELEGRAM_CHAT_ID)
+  payload.set('parse_mode', 'MarkdownV2')
+  payload.set('text', text)
+  const bodyPayload = new URLSearchParams(payload as any).toString()
 
   const telegramUrl = `https://api.telegram.org/bot${SECRET_TELEGRAM_API_TOKEN}/sendMessage`
-  return fetch(telegramUrl, {
-    body: payload,
+  return axios(telegramUrl, {
     method: 'POST',
+    data: bodyPayload,
   })
 }
 
@@ -98,16 +101,19 @@ export async function notifyDiscord(monitor: any, operational: any) {
       },
     ],
   }
-  return fetch(SECRET_DISCORD_WEBHOOK_URL, {
-    body: JSON.stringify(payload),
+  return axios(SECRET_DISCORD_WEBHOOK_URL, {
+    data: JSON.stringify(payload),
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
   })
 }
 
-export async function getCheckLocation() {
-  const res = await fetch('https://cloudflare-dns.com/dns-query', {
+export async function getCheckLocation(): Promise<string | undefined> {
+  const requestAxios = await axios('https://cloudflare-dns.com/dns-query', {
     method: 'OPTIONS',
   })
-  return res.headers.get('cf-ray')?.split('-')[1]
+  const headers = requestAxios.headers
+  if (Object.prototype.hasOwnProperty.call(headers, 'cf-ray'))
+    return headers['cf-ray'].split('-')[1]
+  return undefined
 }

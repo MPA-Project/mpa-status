@@ -20,7 +20,7 @@
     "types": [
       "@cloudflare/workers-types",
       "@types/jest",
-      "@types/node"
+      "@types/node",
     ]
   },
   "include": ["config.d.ts", "bindings.d.ts", "**/*.ts"],

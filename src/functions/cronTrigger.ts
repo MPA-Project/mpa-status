@@ -1,11 +1,12 @@
 import { S3 } from 'aws-sdk'
+import { KV } from 'config.interface'
 import config from '../../config.yaml'
 
 import {
   notifySlack,
   notifyTelegram,
-  getCheckLocation,
   notifyDiscord,
+  getCheckLocation
 } from './helpers'
 
 function getDate() {
@@ -15,10 +16,11 @@ function getDate() {
 export async function processCronTrigger(event: any) {
   // Get Worker PoP and save it to monitorsStateMetadata
   const checkLocation = await getCheckLocation()
+
   const checkDay = getDate()
 
   // Init monitors state
-  let monitorsState = undefined
+  let monitorsState: KV | null = null
   const s3 = new S3({
     endpoint: AWS_S3_ENDPOINT,
     region: AWS_S3_REGION,
@@ -59,7 +61,11 @@ export async function processCronTrigger(event: any) {
     if (typeof monitorsState.monitors[monitor.id] === 'undefined') {
       monitorsState.monitors[monitor.id] = {
         firstCheck: checkDay,
-        lastCheck: {},
+        lastCheck: {
+          operational: false,
+          status: 500,
+          statusText: 'Unknown',
+        },
         checks: {},
       }
     }
@@ -67,7 +73,7 @@ export async function processCronTrigger(event: any) {
     console.log(`Checking ${monitor.name} ...`)
 
     // Fetch the monitors URL
-    const init = {
+    const init: any = {
       method: monitor.method || 'GET',
       redirect: monitor.followRedirect ? 'follow' : 'manual',
       headers: {
@@ -126,7 +132,7 @@ export async function processCronTrigger(event: any) {
     // make sure checkDay exists in checks in cases when needed
     if (
       (config.settings.collectResponseTimes || !monitorOperational) &&
-      !monitorsState.monitors[monitor.id].checks.hasOwnProperty(checkDay)
+      !Object.prototype.hasOwnProperty.call(monitorsState.monitors[monitor.id].checks, checkDay)
     ) {
       monitorsState.monitors[monitor.id].checks[checkDay] = {
         fails: 0,
@@ -137,9 +143,7 @@ export async function processCronTrigger(event: any) {
     if (config.settings.collectResponseTimes && monitorOperational) {
       // make sure location exists in current checkDay
       if (
-        !monitorsState.monitors[monitor.id].checks[checkDay].res.hasOwnProperty(
-          checkLocation as string,
-        )
+        !Object.prototype.hasOwnProperty.call(monitorsState.monitors[monitor.id].checks[checkDay].res, checkLocation as string)
       ) {
         monitorsState.monitors[monitor.id].checks[checkDay].res[
           checkLocation as string

@@ -1,5 +1,6 @@
 const path = require('path')
-const { EnvironmentPlugin } = require("webpack");
+const { EnvironmentPlugin } = require("webpack")
+const nodeExternals = require('webpack-node-externals')
 
 module.exports = {
   entry: './src/index.ts',
@@ -12,10 +13,12 @@ module.exports = {
   resolve: {
     extensions: ['.ts', '.tsx', '.js'],
   },
+  externalsPresets: { node: true },
+  externals: [nodeExternals()],
   module: {
     rules: [
       {
-        test: /\.tsx?$/,
+        test: /\.ts?$/,
         loader: 'ts-loader',
         options: {
           // transpileOnly is useful to skip typescript checks occasionally:
