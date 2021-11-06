@@ -1,5 +1,6 @@
-import { loadConfig } from "../cli/gcMonitors";
 import { S3 } from 'aws-sdk'
+const yaml = require('yaml-loader')
+const fs = require('fs')
 
 import {
   notifySlack,
@@ -9,6 +10,12 @@ import {
   setKVMonitors,
   notifyDiscord,
 } from './helpers'
+
+export function loadConfig() {
+  const configFile = fs.readFileSync('./config.yaml', 'utf8')
+  const config = yaml(configFile)
+  return JSON.parse(config)
+}
 
 const config = loadConfig()
 
