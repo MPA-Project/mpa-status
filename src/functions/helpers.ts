@@ -1,8 +1,8 @@
 import config from '../../config.yaml'
 import { FormData } from 'formdata-node'
-import axios from 'axios'
+// import axios from 'axios'
 
-axios.defaults.adapter = require('axios/lib/adapters/http')
+// axios.defaults.adapter = require('axios/lib/adapters/http')
 
 const kvDataKey = 'monitors_data_v1_1'
 
@@ -59,8 +59,8 @@ export async function notifySlack(monitor: any, operational: any) {
       },
     ],
   }
-  return axios(SECRET_SLACK_WEBHOOK_URL, {
-    data: JSON.stringify(payload),
+  return fetch(SECRET_SLACK_WEBHOOK_URL, {
+    body: JSON.stringify(payload),
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
   })
@@ -82,9 +82,9 @@ export async function notifyTelegram(monitor: any, operational: any) {
   const bodyPayload = new URLSearchParams(payload as any).toString()
 
   const telegramUrl = `https://api.telegram.org/bot${SECRET_TELEGRAM_API_TOKEN}/sendMessage`
-  return axios(telegramUrl, {
+  return fetch(telegramUrl, {
     method: 'POST',
-    data: bodyPayload,
+    body: bodyPayload,
   })
 }
 
@@ -103,19 +103,19 @@ export async function notifyDiscord(monitor: any, operational: any) {
       },
     ],
   }
-  return axios(SECRET_DISCORD_WEBHOOK_URL, {
-    data: JSON.stringify(payload),
+  return fetch(SECRET_DISCORD_WEBHOOK_URL, {
+    body: JSON.stringify(payload),
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
   })
 }
 
 export async function getCheckLocation(): Promise<string | undefined> {
-  const requestAxios = await axios('https://cloudflare-dns.com/dns-query', {
+  const requestAxios = await fetch('https://cloudflare-dns.com/dns-query', {
     method: 'OPTIONS',
   })
   const headers = requestAxios.headers
-  if (Object.prototype.hasOwnProperty.call(headers, 'cf-ray'))
-    return headers['cf-ray'].split('-')[1]
+  if (headers.has('cf-ray') || Object.prototype.hasOwnProperty.call(headers, 'cf-ray'))
+    return headers.get('cf-ray')?.split('-')[1]
   return undefined
 }
