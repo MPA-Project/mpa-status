@@ -1,6 +1,6 @@
-const yaml = require('yaml-loader')
-const fetch = require('node-fetch')
-const fs = require('fs')
+import yaml from "yaml-loader"
+import fetch from "node-fetch"
+import fs from "fs"
 
 
 const accountId = process.env.CF_ACCOUNT_ID
