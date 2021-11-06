@@ -115,7 +115,11 @@ export async function getCheckLocation(): Promise<string | undefined> {
     method: 'OPTIONS',
   })
   const headers = requestAxios.headers
-  if (headers.has('cf-ray') || Object.prototype.hasOwnProperty.call(headers, 'cf-ray'))
-    return headers.get('cf-ray')?.split('-')[1]
+  if (headers.has('cf-ray') || Object.prototype.hasOwnProperty.call(headers, 'cf-ray')) {
+    const getCfRay = headers.get('cf-ray')
+    if (getCfRay) {
+      getCfRay.split('-')[1]
+    }
+  }
   return undefined
 }
