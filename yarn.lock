@@ -695,6 +695,26 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@logdna/logger@npm:^2.4.1":
+  version: 2.4.1
+  resolution: "@logdna/logger@npm:2.4.1"
+  dependencies:
+    "@logdna/stdlib": ^1.1.5
+    agentkeepalive: ^4.1.3
+    axios: ^0.21.1
+    https-proxy-agent: ^5.0.0
+    json-stringify-safe: ^5.0.1
+  checksum: 28172749279c17c231bb5717e1cacb202078ea4c8a19c48d418fcb7fc2051848f512a6ce93c4e1aff8bcadc87ffd2598caf9261d7db7cf65ffe55d51ab37e8bf
+  languageName: node
+  linkType: hard
+
+"@logdna/stdlib@npm:^1.1.5":
+  version: 1.1.5
+  resolution: "@logdna/stdlib@npm:1.1.5"
+  checksum: 40a9040d9f5d8c65405f9f33ebc6ef93abce44f105b919efb76e5437223826a2616eac3783f21ac4eacb9c9124bf9218a454455490a1b23bd2e90f50ddd2d687
+  languageName: node
+  linkType: hard
+
 "@nodelib/fs.scandir@npm:2.1.5":
   version: 2.1.5
   resolution: "@nodelib/fs.scandir@npm:2.1.5"
@@ -1492,12 +1512,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"axios@npm:^0.24.0":
-  version: 0.24.0
-  resolution: "axios@npm:0.24.0"
+"axios@npm:^0.21.1":
+  version: 0.21.4
+  resolution: "axios@npm:0.21.4"
   dependencies:
-    follow-redirects: ^1.14.4
-  checksum: 468cf496c08a6aadfb7e699bebdac02851e3043d4e7d282350804ea8900e30d368daa6e3cd4ab83b8ddb5a3b1e17a5a21ada13fc9cebd27b74828f47a4236316
+    follow-redirects: ^1.14.0
+  checksum: 44245f24ac971e7458f3120c92f9d66d1fc695e8b97019139de5b0cc65d9b8104647db01e5f46917728edfc0cfd88eb30fc4c55e6053eef4ace76768ce95ff3c
   languageName: node
   linkType: hard
 
@@ -2815,7 +2835,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"follow-redirects@npm:^1.14.4":
+"follow-redirects@npm:^1.14.0":
   version: 1.14.5
   resolution: "follow-redirects@npm:1.14.5"
   peerDependenciesMeta:
@@ -4254,6 +4274,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"json-stringify-safe@npm:^5.0.1":
+  version: 5.0.1
+  resolution: "json-stringify-safe@npm:5.0.1"
+  checksum: 48ec0adad5280b8a96bb93f4563aa1667fd7a36334f79149abd42446d0989f2ddc58274b479f4819f1f00617957e6344c886c55d05a4e15ebb4ab931e4a6a8ee
+  languageName: node
+  linkType: hard
+
 "json5@npm:2.x, json5@npm:^2.1.2":
   version: 2.2.0
   resolution: "json5@npm:2.2.0"
@@ -4621,12 +4648,12 @@ __metadata:
   resolution: "mpa-status-page@workspace:."
   dependencies:
     "@cloudflare/workers-types": ^3.1.1
+    "@logdna/logger": ^2.4.1
     "@types/jest": ^27.0.2
     "@types/node": ^16.11.6
     "@typescript-eslint/eslint-plugin": ^5.3.0
     "@typescript-eslint/parser": ^5.3.0
     aws-sdk: ^2.1022.0
-    axios: ^0.24.0
     edge-mock: ^0.0.15
     eslint: ^8.2.0
     eslint-config-prettier: ^8.3.0

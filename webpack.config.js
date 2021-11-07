@@ -34,12 +34,6 @@ module.exports = {
         type: 'json',
         use: 'yaml-loader'
       },
-      {
-        test: /node_modules\/axios/,
-        resolve: { 
-          aliasFields: ["axios"]
-        }
-      },
     ],
   },
 }

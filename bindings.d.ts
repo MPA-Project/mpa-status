@@ -13,6 +13,7 @@ declare global {
   const AWS_S3_ACCESS_KEY: string;
   const AWS_S3_SECRET_KEY: string;
   const STORE_FILENAME: string;
+  const LOG_DNA_INGESTION: string;
 
   
   const KV_STATUS_PAGE: KVNamespace;

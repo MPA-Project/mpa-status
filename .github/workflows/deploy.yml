@@ -41,6 +41,7 @@ jobs:
           [ -z "$AWS_S3_ACCESS_KEY" ] && echo "Secret AWS_S3_ACCESS_KEY not set, creating dummy one..." && AWS_S3_ACCESS_KEY="default-gh-action-secret" || true
           [ -z "$AWS_S3_SECRET_KEY" ] && echo "Secret AWS_S3_SECRET_KEY not set, creating dummy one..." && AWS_S3_SECRET_KEY="default-gh-action-secret" || true
           [ -z "$STORE_FILENAME" ] && echo "Secret STORE_FILENAME not set, creating dummy one..." && STORE_FILENAME="default-gh-action-secret" || true
+          [ -z "$LOG_DNA_INGESTION" ] && echo "Secret LOG_DNA_INGESTION not set, creating dummy one..." && LOG_DNA_INGESTION="default-gh-action-secret" || true
         # postCommands: |
         #   yarn kv-gc
         secrets: |
@@ -54,6 +55,7 @@ jobs:
           AWS_S3_ACCESS_KEY
           AWS_S3_SECRET_KEY
           STORE_FILENAME
+          LOG_DNA_INGESTION
         environment: production
       env:
         CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
@@ -67,3 +69,4 @@ jobs:
         AWS_S3_ACCESS_KEY: ${{secrets.AWS_S3_ACCESS_KEY}}
         AWS_S3_SECRET_KEY: ${{secrets.AWS_S3_SECRET_KEY}}
         STORE_FILENAME: ${{secrets.STORE_FILENAME}}
+        LOG_DNA_INGESTION: ${{secrets.LOG_DNA_INGESTION}}

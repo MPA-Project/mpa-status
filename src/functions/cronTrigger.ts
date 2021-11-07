@@ -1,6 +1,7 @@
 import { S3 } from 'aws-sdk'
 import { KV } from 'config.interface'
 import config from '../../config.yaml'
+import logdna from '@logdna/logger'
 
 import {
   notifySlack,
@@ -9,15 +10,27 @@ import {
   getCheckLocation
 } from './helpers'
 
+const logger = logdna.createLogger(LOG_DNA_INGESTION as string, {
+  app: 'mpa-status-scheduled',
+  level: 'debug'
+})
+
 function getDate() {
   return new Date().toISOString().split('T')[0]
 }
 
 export async function processCronTrigger(event: any) {
+  console.group(`Cron init run`)
+  logger.log(`Cron init run`)
+
   // Get Worker PoP and save it to monitorsStateMetadata
   const checkLocation = await getCheckLocation()
+  console.group(`checkLocation`, checkLocation)
+  logger.log(`checkLocation ${checkLocation}`)
 
   const checkDay = getDate()
+  console.group(`checkDay`, checkDay)
+  logger.log(`checkDay ${checkDay}`)
 
   // Init monitors state
   let monitorsState: KV | null = null
@@ -41,8 +54,11 @@ export async function processCronTrigger(event: any) {
     if (getData.Body) {
       const getDataBody = JSON.parse(getData.Body.toString()) || undefined
       monitorsState = getDataBody
+      console.group(`monitorsState:Load S3`, monitorsState)
+      logger.log(`monitorsState:Load S3 ${monitorsState}`)
     }
   } catch (error: any) {
+    console.groupEnd()
     return new Response(error.message || error.toString(), {
       status: 500,
     })
@@ -51,12 +67,17 @@ export async function processCronTrigger(event: any) {
   // Create empty state objects if not exists in KV storage yet
   if (!monitorsState) {
     monitorsState = { lastUpdate: {}, monitors: {} }
+    console.group(`monitorsState:Create empty`, monitorsState)
+    logger.log(`monitorsState:Create empty`)
   }
 
   // Reset default all monitors state to true
   monitorsState.lastUpdate.allOperational = true
 
   for (const monitor of config.monitors) {
+    console.log(`Checking ${monitor.name} ...`)
+    logger.log(`Checking ${monitor.name} ...`)
+
     // Create default monitor state if does not exist yet
     if (typeof monitorsState.monitors[monitor.id] === 'undefined') {
       monitorsState.monitors[monitor.id] = {
@@ -69,8 +90,6 @@ export async function processCronTrigger(event: any) {
         checks: {},
       }
     }
-
-    console.log(`Checking ${monitor.name} ...`)
 
     // Fetch the monitors URL
     const init: any = {
@@ -85,6 +104,8 @@ export async function processCronTrigger(event: any) {
     const requestStartTime = Date.now()
     const checkResponse = await fetch(monitor.url, init)
     const requestTime = Math.round(Date.now() - requestStartTime)
+    console.log(`requestTime ${requestTime} ...`)
+    logger.log(`requestTime ${requestTime} ...`)
 
     // Determine whether operational and status changed
     const monitorOperational =
@@ -195,7 +216,10 @@ export async function processCronTrigger(event: any) {
 
   try {
     await s3.upload(s3ParamsUpload).promise()
+    console.log(`Saving S3 ...`)
+    logger.log(`Saving S3 ...`)
   } catch (error: any) {
+    console.groupEnd()
     return new Response(error.message || error.toString(), {
       status: 500,
     })

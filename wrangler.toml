@@ -1,4 +1,4 @@
-name = "status"
+name = "mpastatus"
 workers_dev = true
 zone_id = ""
 account_id = ""

@@ -1,8 +1,5 @@
 import config from '../../config.yaml'
 import { FormData } from 'formdata-node'
-// import axios from 'axios'
-
-// axios.defaults.adapter = require('axios/lib/adapters/http')
 
 const kvDataKey = 'monitors_data_v1_1'
 
