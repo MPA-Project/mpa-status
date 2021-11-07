@@ -120,3 +120,24 @@ export async function getCheckLocation(): Promise<string | undefined> {
   }
   return undefined
 }
+
+export async function sendLog(message: string, meta: any = {}) {
+  const payload = { 
+    lines: [ 
+      { 
+        line: message, 
+        app: "MPA-Status",
+        level: "INFO",
+        meta
+      }
+    ] 
+  }
+  return fetch(`https://logs.logdna.com/logs/ingest?now=${Date.now()}`, {
+    body: JSON.stringify(payload),
+    method: 'POST',
+    headers: {
+      Authorization: `Basic ${LOG_DNA_INGESTION}`,
+      'Content-Type': 'application/json; charset=UTF-8'
+    },
+  })
+}
