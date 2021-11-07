@@ -1,7 +1,7 @@
 import { S3 } from 'aws-sdk'
 import { KV } from 'config.interface'
 import config from '../../config.yaml'
-// import logdna from '@logdna/logger'
+import logdna from '@logdna/browser'
 
 import {
   notifySlack,
@@ -10,10 +10,16 @@ import {
   getCheckLocation
 } from './helpers'
 
-// const logger = logdna.createLogger(LOG_DNA_INGESTION as string, {
+// const logger = logdna.init(LOG_DNA_INGESTION as string, {
 //   app: 'mpa-status-scheduled',
 //   level: 'debug'
 // })
+logdna.init(LOG_DNA_INGESTION as string).addContext({
+  // Context is appended to the metadata of each message sent to LogDNA
+  // Add any custom meta data such as:
+  version: 'v1.0.0',
+  sessionReplay: 'https://mpastatus-production.myponyasia.workers.dev/',
+})
 
 function getDate() {
   return new Date().toISOString().split('T')[0]
@@ -21,16 +27,16 @@ function getDate() {
 
 export async function processCronTrigger(event: any) {
   console.group(`Cron init run`)
-  // logger.log(`Cron init run`)
+  logdna.log(`Cron init run`)
 
   // Get Worker PoP and save it to monitorsStateMetadata
   const checkLocation = await getCheckLocation()
   console.group(`checkLocation`, checkLocation)
-  // logger.log(`checkLocation ${checkLocation}`)
+  logdna.log(`checkLocation ${checkLocation}`)
 
   const checkDay = getDate()
   console.group(`checkDay`, checkDay)
-  // logger.log(`checkDay ${checkDay}`)
+  logdna.log(`checkDay ${checkDay}`)
 
   // Init monitors state
   let monitorsState: KV | null = null
@@ -55,7 +61,7 @@ export async function processCronTrigger(event: any) {
       const getDataBody = JSON.parse(getData.Body.toString()) || undefined
       monitorsState = getDataBody
       console.group(`monitorsState:Load S3`, monitorsState)
-      // logger.log(`monitorsState:Load S3 ${monitorsState}`)
+      logdna.log(`monitorsState:Load S3 ${monitorsState}`)
     }
   } catch (error: any) {
     console.groupEnd()
@@ -68,7 +74,7 @@ export async function processCronTrigger(event: any) {
   if (!monitorsState) {
     monitorsState = { lastUpdate: {}, monitors: {} }
     console.group(`monitorsState:Create empty`, monitorsState)
-    // logger.log(`monitorsState:Create empty`)
+    logdna.log(`monitorsState:Create empty`)
   }
 
   // Reset default all monitors state to true
@@ -76,7 +82,7 @@ export async function processCronTrigger(event: any) {
 
   for (const monitor of config.monitors) {
     console.log(`Checking ${monitor.name} ...`)
-    // logger.log(`Checking ${monitor.name} ...`)
+    logdna.log(`Checking ${monitor.name} ...`)
 
     // Create default monitor state if does not exist yet
     if (typeof monitorsState.monitors[monitor.id] === 'undefined') {
@@ -105,7 +111,7 @@ export async function processCronTrigger(event: any) {
     const checkResponse = await fetch(monitor.url, init)
     const requestTime = Math.round(Date.now() - requestStartTime)
     console.log(`requestTime ${requestTime} ...`)
-    // logger.log(`requestTime ${requestTime} ...`)
+    logdna.log(`requestTime ${requestTime} ...`)
 
     // Determine whether operational and status changed
     const monitorOperational =
@@ -217,7 +223,7 @@ export async function processCronTrigger(event: any) {
   try {
     await s3.upload(s3ParamsUpload).promise()
     console.log(`Saving S3 ...`)
-    // logger.log(`Saving S3 ...`)
+    logdna.log(`Saving S3 ...`)
   } catch (error: any) {
     console.groupEnd()
     return new Response(error.message || error.toString(), {
